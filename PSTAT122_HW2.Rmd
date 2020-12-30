@@ -1,0 +1,115 @@
+---
+title: "Pstat122_HW2"
+author: "Celeste Herrera"
+date: "4/22/2020"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### **3.14 A pharmaceutical maunfacturer wants to investigate the bioactivity of a new drug. A completely randomized single-factor experiment was conducted with three dosage levels, and the following results were obtained.**
+
+$H_0 : \mu_{20} = \mu_{30} = \mu_{40}$
+
+$H_1$ : At least one $\mu_{i}$ is different 
+
+
+**(a) Is there evidence to indicate that the dosage level affects the bioactivity? $\alpha=.05$**
+
+```{r}
+experiment <-data.frame(observations=c(24,28,37,30,
+                        37,44,31,35,
+                        42,47,52,38),dosage= factor(rep(seq(20,40,by=10),each=4)))
+experiment
+
+dosage= factor(rep(seq(20,40,by=10),each=4))  # needed to be redefined for knitting purposes
+n = 4  # The number values of observations
+a = 3  # number of levels of dosage
+N = n*a  # total number of observations
+level = aov(observations~dosage, data= experiment)
+summary(level)
+```
+Since the p-value is 0.0145 < $\alpha = .05$, reject the null hypothesis. There is sufficient evidence to suggest that there is a difference in the bioactivity at the $\alpha = 0.05$ level.
+
+**(b) If it is appropiate to do so, make comparisons between the parts of means. What conclusions can you draw?**
+
+$$
+H_{1}: \mu_{20} = \mu_{30}
+$$
+
+```{r}
+library(contrast)
+fit1 <-lm(observations~dosage, data= experiment)
+contrast(fit1, list(dosage = as.factor(20)),list(dosage = as.factor(30)))
+```
+From this contrast, we fail to reject the null hypothesis since the p-value is bigger than our $\alpha =.05$. Since we failed to reject, we can conclude the dosages of 20 and 30 do not have affect on the bioactivity. 
+
+$$
+H_{2}: \mu_{20} = \mu_{40}
+$$
+
+```{r}
+contrast(fit1, list(dosage = as.factor(20)),list(dosage = as.factor(40)))
+```
+
+From the contrast, we reject the null hypothesis because the p-value is less than $\alpha=.05$. So, we can conclude that the dosages of 20 and 40 do affect the bioactivity.
+
+$$
+H_{3}: \mu_{30} = \mu_{40}
+$$
+
+```{r}
+contrast(fit1, list(dosage = as.factor(30)),list(dosage = as.factor(40)))
+```
+
+From the contrast, we fail to reject the null hypothesis since the p-value is bigger than our $\alpha =.05$. Since we failed to reject, we can conclude the dosages of 30 and 40 do not have affect on the bioactivity. 
+
+**(c)Analyze the residuals from the experiment and comment on model adequacy**
+```{r}
+qqnorm(level$residuals, main = 'Normal Q-Q Plot of Residuals')
+qqline(level$residuals, col= 'blue')
+
+plot(level$residuals~level$fitted.values, main = "Residuals vs. Fitted Values", xlab = " Fitted Values", ylab = "Residuals")
+
+plot(level$residuals~dosage, main = "Residuals vs. Dosage", xlab= "Fluid Type", ylab= "Residuals")
+```
+
+Considering that the Normal Q-Q plot gave a good approximation along the diagonal, we can assume that the normality assumption is satisfied. Although it was safe to note that there is no type of given pattern for the residuals vs. fit plot it is safe to assume that the equal variance assumption is satisied. And lastly there is a consideration of the data being collected randomly during a randomized experiment, it is safe to asssume that the independence assumption is completely satisfied. 
+
+
+#### **3.17 A regional opera company has tried three approaches to solicit donations from 24 potentials sponsors. The 24 potential sponsors were randomly divided into three groups of eight, and one approach wass used for each group. The dollar amounts of the resulting contributions are shown in the following table.**
+
+**(a) Do the data indicate that there is a difference in results obtained from the three different apporaches? Use $\alpha = .05$**
+
+$H_0 : \mu_{approach1} = \mu_{approach2} = \mu_{approach3}$
+
+$H_1$ : At least one $\mu_{i}$ is different 
+
+```{r}
+Contributions<-c(1000,1500,1200,1800,1600,1100,1000,1250,
+   1500,1800,2000,1200,2000,1700,1800,1900,
+   900,1000,1200,1500,1200,1550,1000,1100)
+Approach <- factor(rep(1:3,each=8))
+cbind(Approach,Contributions)
+a<- aov(Contributions~Approach)
+a
+summary(a)
+```
+Since the p-value is .00121 < $\alpha =.05$,  reject the null hypothes. There is sufficent evidence to suggest there is a difference in results obtained from the three different apporaches.
+
+**(b) Analyze the residuals from this experiment and comment on model adequacy.**
+```{r}
+qqnorm(a$residuals, main = "Normal Q-Q Plot of Residuals")
+qqline(a$residuals, col= "blue")
+
+plot(a$residuals~a$fitted.values, main = "Residuals vs. Fitted Values", xlab = " Fitted Values", ylab = "Residuals")
+
+plot(a$residuals~Approach, main = "Residuals vs. Approach", xlab= "Fluid Type", ylab= "Residuals")
+```
+
+Considering that the Normal Q-Q plot gave a good approximation along the diagonal, we can assume that the normality assumption is satisfied. Although it was safe to note that there is no type of given pattern for the residuals vs. fit plot it is safe to assume that the equal variance assumption is satisied. And lastly there is a consideration of the data being collected randomly during a randomized experiment, it is safe to asssume that the independence assumption is completely satisfied. 

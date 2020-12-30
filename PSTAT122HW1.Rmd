@@ -1,0 +1,125 @@
+---
+title: "PSTAT122 HW1"
+output:
+  pdf_document: default
+  html_document: default
+Author: Celeste Herrera
+---
+
+#### **2.25 The following are the burning times (in minuites) of chemical flares of two different  formulations. The design engineers are interested in both the mean and the variance the burning times.**
+
+```{R}
+Type1 <- c(65,81,57,66,82,82,67,59,75,70)
+Type1
+Type2 <- c(64,71,83,59,65,56,69,74,82,79)
+Type2
+```
+**(a) Test the hypothesis that the two varaiances are equal. Use $\alpha =.05$.**
+$H_0 : \sigma{1}^2 = \sigma{1}$
+$H_1 : \sigma{1}^2 \ne \sigma{1}$
+
+We are going to use an F-test at $\alpha=.05$.
+```{r}
+ybar1 <-mean(Type1)
+ybar1
+Variance_ybar1 <-var(Type1)
+Variance_ybar1
+ybar2 <- mean(Type2)
+ybar2
+Variance_ybar2 <- var(Type2)
+Variance_ybar2
+f <- Variance_ybar1 / Variance_ybar2
+f
+```
+```{r}
+qf(.975,9,9)
+qf(.025,9,9)
+pf(0.9782168,9,9)
+```
+Since our observed F statistic is lower than our critical F distribution we can conclude that we fail to reject $H_0$
+
+**(b) using the results of part (a), test the hypothesis that the mean burning times are equal. Use $\alpha =.05$. What is the P-value for this test?**
+
+```{r}
+n1 = 10
+n2 =10
+ybar1 <-mean(Type1)
+ybar1
+ybar2 <- mean(Type2)
+ybar2
+Variance_type1 <-var(Type1)
+Variance_type1
+Variance_type2 <- var(Type2)
+Variance_type2
+
+sp_num = ((n1-1)*Variance_type1) + ((n2-1)*Variance_type2)
+sp_den = n1 + n2 -2
+sp = sqrt(sp_num / sp_den)
+sp
+t_stat <-(ybar1 - ybar2)/ (sp* (sqrt((1/n1)+(1/n2))))
+t_stat
+qt(.025,n1 + n2-2, lower.tail = F)
+pt(t_stat, n1+n2-2)
+```
+Concluding to fail to reject the null $H_0$
+
+**(c) Disscuss the role of the normaliity assumption in this problem. Check the assumption of normality for both types of flares.**
+```{R}
+Type1 <- c(65,81,57,66,82,82,67,59,75,70)
+Type1
+Type2 <- c(64,71,83,59,65,56,69,74,82,79)
+Type2
+Type1_Type2_Diff = Type1 - Type2
+Type1_Type2_Diff
+qqnorm(Type1_Type2_Diff)
+qqline(Type1_Type2_Diff, col = 'red')
+```
+
+There is 2 data points that are relativley fat from the data that follows the line realtiviley well, so the overall trend seems to be normally distributed.
+
+#### **2.29 The Diameter of a ball bearing was measured by 12 inspectors, each using two different kinds of calipers. The results are as follows:**
+
+``` {R}
+
+Inspector <- c(1,2,3,4,5,6,7,8,9,10,11,12)
+Inspector
+Caliper_1<- c(.265,.265,.266,.267,.267,.265,.267,.267,.265,.268,.268,.265)
+Caliper_1
+Caliper_2 <- c(.264,.265,.264,.266,.267,.268,.264,.265,.265,.267,.268,.269)
+Caliper_2
+```
+
+**(a) Is there significant difference between the means of the population of measurements from which the two samples were selected? $\alpha=.05$**
+
+$H_0 : \mu_1 = \mu_2$
+$H_1 : \mu_1 \ne \mu_2$
+```{R}
+mean_caliper1 <- mean(Caliper_1)
+mean_caliper1
+mean_caliper2<-mean(Caliper_2)
+mean_caliper2
+Caliper_Order_Diff = Caliper_1 - Caliper_2
+sdsqd <- (1/11)*sum((Caliper_Order_Diff - mean(Caliper_Order_Diff))^2)
+sdsqd
+t <-mean(Caliper_Order_Diff)/(sqrt(sdsqd)/sqrt(12))
+t
+t.test(Caliper_1,Caliper_2, paired = TRUE)
+```
+No, are test statistic is 0.4317878 there isn't a significant diference between the mean of the following populations from the Calipers selected.
+
+**(b) Find the P-value for the test in part (a)*
+
+#Due to the t.test we were given a p-value of 0.6742
+
+
+**(c) Construct a 95 percent confidence Interval on the difference in mean diameter measurements for the two types of calipers.**
+```{r}
+upper_bound <- mean(Caliper_Order_Diff) +qt(.025,11,lower.tail = FALSE)*sqrt(sdsqd)/sqrt(12)
+upper_bound
+
+lower_bound <- mean(Caliper_Order_Diff) -qt(.025,11,lower.tail = FALSE)*sqrt(sdsqd)/sqrt(12)
+lower_bound
+t.test(Caliper_1,Caliper_2, paired = TRUE)
+```
+As shown in our t.test output The 95% condidence interval of the mean diameter measurments for the two types of calipers is ( -0.001024344  0.001524344).
+

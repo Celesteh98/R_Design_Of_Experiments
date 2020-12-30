@@ -1,0 +1,120 @@
+---
+title: "PSTAT122_HW5"
+author: "Celeste Herrera"
+date: "6/1/2020"
+output: pdf_document
+---
+
+#### **13.1 an experiment was performed to investigate the capability of a measurement system. Ten parts were randomly selected, and two randomly selected operators measured each part three times. The tests were made in random order, and the data are shown in table P13.1**
+
+```{r}
+Operator<- factor(rep(1:2, each = 30)) 
+PartNo <- factor(rep(1:10, times =6))
+measurements <-c(50,49,50,50,48,51,
+                          52,52,51,51,51,51,
+                          53,50,50,54,52,51,
+                          49,51,50,48,50,51,
+                          48,49,48,48,49,48,
+                          52,50,50,52,50,50,
+                          51,51,51,51,50,50,
+                          52,50,49,53,48,50,
+                          50,51,50,51,48,49,
+                          47,46,49,46,47,48)
+
+data = cbind(PartNo,Operator,measurements)
+data
+a <- 10
+b <- 2
+n <-3
+```
+$H_{0}: \sigma^{2}_{\tau\beta} = 0$
+
+$H_{1}:\sigma^{2}_{\tau\beta} > 0$
+
+**(a) Analyze the data from this experiment.**
+```{r}
+analysis.aov<- aov(measurements~ PartNo*Operator)
+summary(analysis.aov)
+```
+
+$H_{0}: \sigma^{2}_{\tau\beta} = 0$
+
+$H_{1}:\sigma^{2}_{\tau\beta} > 0$
+
+$F_{0} =\frac{MS_{AB}}{MS_{E}} = \frac{0.602}{1.500} = .401333$
+
+p-value = 0.927
+
+The p-value is much larger thatn than $\alpha = .05$ therefore, we will fail to reject the null hypothesis. So we can conclude that there is not enought evidence to say there is an interaction betweeen part number and the operator to have an affect on the measurement.
+
+To now test the invdividual factors
+
+$H_{0}: \sigma^{2}_{\tau} = 0$
+
+$H_{1}:\sigma^{2}_{\tau} > 0$
+
+$F_{0}= \frac{MS_{A}}{MS_{AB}} = \frac{11.002}{0.602} = 18.2757475$
+```{r}
+pf(18.2757475, a-1, (a-1)*(b-1), lower.tail = FALSE)
+```
+
+p-value = 9.39006e-05
+
+Since the p-value is much less than $\alpha = .05$ we will reject the null hypothesis. Therefore we can conclude that the evidence suggests that part significantly affects measurements.
+
+
+$H_{0}: \sigma^{2}_{\beta} = 0$
+
+$H_{1}:\sigma^{2}_{\beta} > 0$
+
+$F_{0} \frac{MS_{B}}{MS_{AB}} = \frac{0.417}{0.602} = .69269103$
+
+```{r}
+pf(.69269103, b-1, (a-1)*(b-1), lower.tail = FALSE)
+```
+
+p-value = 0.4267823
+
+Since the p-value is much larger than $\alpha =.05$ we will fail to reject the null hypothesis. Which allows us to say that there is insufficent evidence to state that the operator significantly affects the meaurements.
+
+**(b) Estimate the variance componets using the ANOVA method.**
+$\hat\sigma^{2} = MS_{E} = 1.50$
+
+$\hat\sigma^{2}_{\tau\beta} = \frac{MS_{AB} - MS_{E}}{n} = \frac{0.602 - 1.50}{3} = - 0.299333 \approx 0$ 
+
+$\hat\sigma^{2}_{\tau} = \frac{MS_{A} - MS_{AB}}{bn} = \frac{11.002 - .602}{2(3)} = 1.733$
+
+$\hat\sigma^{2}_{\beta} = \frac{MS_{B} - MS_{AB}}{an} = \frac{0.417 - 0.602}{10(3)} = -0.006167 \approx 0$
+
+
+#### **13.5 Reanalyze the measurement systems experiment in Problem 13.1, assuming that operators are a fixed factor. Estimate the appropriate model components using the ANOVA method.**
+
+$H_{0}: \beta{j} = 0$ for all j
+
+$H_{1}: \beta{j} \ne 0$ for some j
+
+$F_{0} \frac{MS_{B}}{MS_{AB}} = \frac{0.417}{0.602} = 0.69259103$
+
+```{r}
+pf(0.69269103, b-1, (a-1)*(b-1), lower.tail = FALSE)
+```
+
+Since the p-value is 0.4267823 which is much larger than $\alpha = .05$ we conclude that we will fail to reject the null hypothesis.
+
+$H_{0}: \sigma^2_{\tau} = 0$ for all j
+
+$H_{1}: \sigma^2_{\tau} > 0$
+
+$F_{0} = \frac{MS_{A}}{MS_{E}} = \frac{11.002}{1.5} = 7.334666667$
+
+```{r}
+pf(7.334666667, a-1, a*b*(n-1), lower.tail = FALSE)
+```
+
+The p-value is 3.215391e-06 which is much smaller than $\alpha = .05$ so we can conclude that we can reject the null hypothesis.
+
+$\hat\sigma^{2} = MS_{E} = 1.5000$
+
+$\hat\sigma^{2}_{\tau\beta} = \frac{MS_{AB} - MS_{E}}{n} = \frac{0.602 - 1.5000}{3} = -0.299333 \approx 0$
+
+$\hat\sigma^{2}_{\tau} = \frac{MS_{AB} - MS_{E}}{n} = \frac{11.002 - 1.5000}{2(3)} = 1.58364$

@@ -1,0 +1,128 @@
+---
+title: "PSTAT 122 Final"
+author: "Celeste Herrera"
+date: "6/11/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+
+
+
+The final will concentrate on two questions, The first question regarding a Farmer trying to decide which crop he should permanently use for all of his crops. So the farmer will experiment using six new brands (A, B, C, D, E, and F) of fertlizier to grow crops that had recently came onto the market. The farmer plans to use all six fertilizers for one farming season onto five one acre tracts of land. The farmer puts the fertilizers onto the wheat without the knowledge of knowing what fertilizer is placed on the wheat. In order for his production of wheat to be successful we need to analyze the data in the best way possible and report our findings to see what fertilizer is best used this season for the wheat and to use it for future seasons.
+
+Now as to creating a question of interest for our 2 final exam questions. The first question pertaining to the first final exam question is, “Is there any indication that the fertilizers differ from one another?” 
+
+#### **Six new brands (A, B, C, D, E, and F) of fertilizer that a farmer can use to grow crops just came on the market. Before deciding which brand he should use permanently for all crops, a farmer decided to experiment for one season. To do so, he randomly assign each fertilizer to five one-acre tracts of land that he used to grow wheat. The following table gives the production of wheat (in bushels) for each acre for six brands of fertilizer.**
+
+```{r}
+wheat <-c(73,70,71,65,76,75,82,82,80,86,69,67,76,74,74,68,77,76,73,71,69,63,65,65,58,80,87,86,84,78)
+Fertilizer<- factor(rep(1:6,each =5))
+dataset =data.frame(Wheat = wheat, Fertilizer = Fertilizer)
+dataset
+```
+
+**Analyze the data and report your findings. Use $\alpha = 0.05$ for any tests performed to support your findings.**
+
+As we asked ourselves is there any indication that the fertilizers differ from one another? We will be using a few tests to perform and support our results to be correct or not.
+
+So first before indicating what type of test to be used we will show that what type of null hypothesis and alternative hypothesis we will be using. Which is,
+
+
+$H_{0}: \mu_{A} = \mu_{B} = \mu_{C} = \mu_{D} = \mu_{E} = \mu_{F}$
+$H_{1}$: At least one $\mu_{i}$ differs 
+
+We will be using the fixed affect model: $Y_{ij} = \mu + \tau_{i} + \epsilon_{ij}$
+We will also assume it is a normal iid.
+
+```{r}
+ # Now we will use the anova table
+Fertilizer_aov<- aov(wheat~Fertilizer)
+summary(Fertilizer_aov)
+```
+
+As the anova table shows the p-value 5.78e-07 *** which is much smaller than $\alpha =.05$ we will reject the null hypothesis and conclude that one of mean populations differ, so we will now use a test to help support this hypothesis.
+The test that we will be using to help support would be the contrasts, which would regard having to state a few new hypothesis tests.
+```{r}
+library(agricolae)
+plot(LSD.test(Fertilizer_aov,"Fertilizer"))
+```
+In the LSD.test it indicates that Fertilizer 6 is shown to have the best output for the wheat compared to the other 5 fertilizers. Although Fertilizer 2 is similarly close to Fertilizer 6 is it is not the best suitable solution. Whether as Fertilizers 4,3,1 are roughly close to one another while Fertilizer 5 is definitenly shown to not be the best suitable solution for the Fertilizer. 
+
+
+```{r}
+qqnorm(Fertilizer_aov$residuals,main="Normal Q-Q Plot of Residuals") 
+qqline(Fertilizer_aov$residuals,col="red")
+plot(Fertilizer_aov$residuals~Fertilizer_aov$fitted.values,main="Residuals vs. Predicted",xlab="Predicted",ylab="Residuals")
+```
+
+```{r}
+bartlett.test(wheat,Fertilizer)
+```
+
+
+
+While the second question pertains to an Engineer trying to find the most effective battery for use. In order to find the best fitting battery the engineer needs to be aware of how the temperature impacts the battery life and the type of material supporting the overall battery life. So, the engineer tests three different material types for the battery as well as checking three different types of temperature to see the type of effect it will have on the battery life.
+
+
+
+And the other question pertaining to the second final exam question is “ What effects do material type and temperature have on the life of the battery?"
+
+
+
+#### **(70%) 2. An engineer is designing a battery for use. He has three possible plate materials to use. He is aware that temperature may affect the effective battery life and decides to test all three plate materials at three temperature levels (15, 70 and 125 oF). The experiment and the resulting observed battery life (in hours) are given below.**
+
+
+**Analyze the data and report your findings. Use $\alpha = 0.05$ for any tests performed to support your findings.**
+```{r}
+Materialtype= factor(c(rep(1:3, each = 6))) 
+TempLevel = factor(c(rep(c(15,70,125),times=3, each =2)))
+batterylife <-c(147,153,182,178,128,124,157,161,144,150,121,119,132,126,156,162,109,107)
+df.data_points = cbind(Materialtype,TempLevel,batterylife)
+df.data_points
+a=2
+b=3
+n=2
+```
+
+The model is $Y_{ijk} = \mu + \tau_{i} + \beta_{j} + (\tau\beta)_{ij} + \epsilon_{ijk}$ with i= 1,...,a j=1,...,b k = 1,...,n. 
+
+Assumptions: $\sum_{i}\tau_{i}$ = $\sum_{j}\beta_{j}$ = $\sum_{i}\tau\beta_{ij}$ = $\sum_{j}\tau\beta_{ij}$ = 0; normal iid $\epsilon_{ijk}$
+
+$H_{0}: (\tau\beta)_{ij} = 0$ for all i,j
+
+$H_{A}:(\tau\beta)_{ij} \ne 0$ for some i,j
+
+We will use the indication of the ANOVA table to indicate if our null hypothesis is sufficent or not. In order to do so, we will check the p-value, there are different ways as to checking whether or not to reject the null hypothesis such as finding the F-statistic, but in a more effective way in my opinion is to use the p-value which I believe is a good indication for us.
+
+```{r}
+battery.aov <- aov(batterylife~ Materialtype*TempLevel) 
+summary(battery.aov)
+```
+
+$F = 27.0$
+p-value = 5.00e-05 ***
+
+Since the p-value is smaller then our $\alpha = .05$, we do reject our null hypothesis. There is enought sufficent evidence to conclude that there is a signficant interaction effect.
+
+```{r}
+library(stats)
+interaction.plot(TempLevel,Materialtype,batterylife)
+```
+
+
+```{r}
+plot(battery.aov$fitted.values,battery.aov$residuals,ylab="Residuals", xlab = "Fitted Values",main="Residuals vs Fitted Values")
+abline(h=0,col="red")
+qqnorm(battery.aov$residuals) 
+qqline(battery.aov$residuals,col="blue")
+hist(battery.aov$residuals,main="Histogram of Residuals")
+```
+```{r}
+library(contrast)
+fit1 <-lm(batterylife~ Materialtype*TempLevel)
+contrast(fit1, list(Materialtype = as.factor(1)),list(Materialtype = as.factor(2)))
+```
+
+

@@ -1,0 +1,72 @@
+---
+title: "PSTAT 122 Homework 3"
+author: "Celeste Herrera"
+date: "5/14/2020"
+output: pdf_document
+---
+
+#### **3.31 An article in the Journal of Electrochemical Society (Vol.139 =, No. 2,1992, pp. 524-532) describes an experiment to investigate the low-pressure vapor deposition of polysilicon. The experiment was caried out in a large capacity reactor at Sematech in Austin, Texas. The reactor has several wafer positions, and four of these positions are selected at random. The response variable is film thickness uniformity. Three replicates of the experiment were run, and the data are as follows:**
+
+```{r}
+wafer_position <- factor(c(rep(1:4,each=3)))
+uniformity <-c(2.76,5.67,4.49,1.43,1.70,2.19,2.34,1.97,1.47,0.94,1.36,1.65)
+cbind(wafer_position,uniformity)
+```
+
+**(a) Is there a difference in wafer positions? Use $\alpha =.05$.**
+
+$$
+H_{0}:  \sigma_{\tau}^2 =0
+$$
+$$
+H_{1}: \sigma_{\tau}^2 > 0
+$$
+
+```{r}
+model <- aov(uniformity~ wafer_position)
+summary(model)
+```
+
+Since the p-value is small (0.00775 < .05), we are able to state that there is eveidence there is a difference between wafer positions.
+
+**(b) Estimate the variability due to wafer positions**
+$$
+\sigma_{\tau}^2 = \frac{MSTrt - MSE}{n} = \frac{5.407 - 0.652}{3} = 1.585
+$$
+
+**(c) Estimtate the random error componet.**
+$$
+\sigma^{2} = MSE = 0.652
+$$
+
+**(d) Analyze the residuals from this experiment and componet model adequcacy**
+```{r}
+qqnorm(model$residuals)
+qqline(model$residuals, col = 'blue')
+
+#now doing the residual Vs. Fit plot to check equal variances
+plot(model$fitted.values, model$residuals, xlab = 'Fitted Values', ylab = 'Residuals', main = 'Residuals vs Fitted Values')
+abline(h=0)
+```
+
+Based on the plots used above. The normality and equal variance assumptions have been satisfied. The residuals are approximately normally distributed with mean zero and a common constant variance, although there is some fanning.
+
+#### **4.7 A chemist wishes to test the effect of four chemical agents on the strength of a particular type of cloth. Because there might be variability from one bolt to another, the chemist decides to use a randomized block design, with the bolts of cloth considered as blocks. She selects five bolts. The resulting tensile strengths follow. Analyza the data from this experiment (use $\alpha$ = .05) and draw appropiate conclusions.**
+
+```{r}
+chemical <- as.factor(c(rep(1:4,each=5)))
+bolt<- as.factor(c(rep(1:5,times=4)))
+data <- c(73,68,74,71,67,73,67,75,72,70,75,68,78,73,68,73,71,75,75,69)
+dataset<- cbind(chemical,bolt,data)
+dataset
+dataset.aov <- aov(data ~ chemical + bolt)
+summary(dataset.aov)
+```
+```{r}
+library(agricolae)
+LSD.test(data,chemical, DFerror = 12, MSerror = 1.82,alpha = 0.05) 
+plot(LSD.test(data, chemical, DFerror = 12, MSerror = 1.82,alpha = 0.05))
+```
+
+Since the p-value is much larger than $\alpha =.05$, there is sufficient evidence to suggest that there is no difference between the means of the three solutions. The Fisher LSD procedure indicates that chemicals 4 and 1 is significantly different than the other two.
+Model: $y_{ij} = \mu + \tau_{i} + \beta_{j} + \epsilon_{ij}$

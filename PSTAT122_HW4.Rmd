@@ -1,0 +1,46 @@
+---
+title: "PSTAT122_Hw4"
+author: "Celeste Herrera"
+date: "5/31/2020"
+output: pdf_document
+---
+
+#### **5.12 An experiment in conducted is conducted to study the influence of operating temperature and three types of faceplate glass in the light output of an oscillopse tube. The following data are collected:**
+```{r}
+GlassType= factor(c(rep(1:2, each = 9))) 
+TempLevel = factor(c(rep(c(100,125,150), times =6)))
+light <-c(580,1090,1392,
+                568,1087,1380,
+                570,1085,1386,
+                550,1070,1328,
+                530,1035,1312,
+                579,1000,1299)
+df.data_points = cbind(GlassType,TempLevel,light)
+df.data_points
+```
+Model: $y_{ij} = \mu + \tau_{i} + \beta_{j} + \epsilon_{ijk}$ with $i$ = 1,...,a; $j$ = 1,...,b; k=1,...,n
+
+Assumptions: $\sum_{i}\tau_{i}$ = $\sum_{j}\beta_{j}$ = $\sum_{i}\tau\beta_{ij}$ = $\sum_{j}\tau\beta_{ij}$ = 0; normal iid $\epsilon_{ijk}$
+
+**(a) Use $\alpha =.05$ in the analysis. Is there a significant interaction effect? Does glass type or temperature affect the response? What conclusions can you draw**
+$H_{0}: (\tau\beta)_{ij} = 0$ for all i,j
+
+$H_{A}:(\tau\beta)_{ij} \ne 0$ for some i,j
+
+```{r}
+aov.output<- aov(light~ GlassType*TempLevel)
+summary(aov.output)
+```
+$F = 3.06$
+p-value = 0.084350
+
+Since the p-value is greater then our $\alpha = .05$, we do not reject our null hypothesis. There is not enought sufficent evidence to conclude that there is a signficant interaction effect..
+
+Yes, the glass type does affect the response because both p-values are less than $\alpha =.05$
+
+```{r}
+library(stats)
+interaction.plot(TempLevel,GlassType,light)
+```
+
+There shows no significant interaction betweeen temperature levels and glass types, the lines in the interaction plot are almost parallel towards one another. The plot shows that temperature levels rise as the mean of light rises. Althought they all show good life span of light, both glass types shows an increase in temperatures and the response.
